@@ -18,3 +18,7 @@ a {
 * {
   box-sizing: border-box;
 }
+
+.container-bg-default {
+  background-color: #f7fafc;
+}
