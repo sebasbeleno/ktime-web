@@ -1,8 +1,7 @@
 // pages/profile.js
-import { withPageAuthRequired } from "@auth0/nextjs-auth0";
+import { getSession, withPageAuthRequired } from "@auth0/nextjs-auth0";
 import { supabaseClient } from "@supabase/auth-helpers-nextjs";
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
 import Layout from "../../components/layout";
 import {
   getEffortByDay, getMostCodedLanguages, getMostCodedProjects, getTimeSpendByLanguages,
@@ -25,72 +24,11 @@ const MyResponsiveCalendar = dynamic(
   }
 );
 
-const Dashboard = ({ user }) => {
-  const [filesLogs, setFilesLogs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [timeSpendByLanguages, setTimeSpendByLanguages] = useState([]);
-  const [timeSpentOnLanguagesByDate, setTimeSpentOnLanguagesByDate] = useState(
-    []
-  );
-  const [effortBydate, setEffortBydate] = useState([]);
-  const [mostCodedlanguages, setMostCodedlanguages] = useState([]);
-  const [mostCodedProjects, setMostCodedProjects] = useState([]);
-
-  useEffect(() => {
-    const getUserFileLogs = async () => {
-      const { error, data } = await supabaseClient
-        .from("user_logs")
-        .select("*")
-        .eq("sub", user.sub);
-
-      setFilesLogs(data);
-
-      if (data.length > 0) {
-        const timeSpendByLanguages = await getTimeSpendByLanguages(
-          data[0].files_logs
-        );
-
-        const timeSpentOnLanguagesByDay = await getTimeSpentOnLanguagesByDay(
-          data[0].files_logs
-        );
-
-        const effortByDay = await getEffortByDay(data[0].files_logs);
-
-        const mostCodedlanguages = await getMostCodedLanguages(
-          data[0].files_logs
-        );
-
-        const mostCodedProjects = await getMostCodedProjects(
-          data[0].files_logs
-        );
-
-        setEffortBydate(effortByDay);
-        setTimeSpendByLanguages(timeSpendByLanguages);
-        setTimeSpentOnLanguagesByDate(timeSpentOnLanguagesByDay);
-        setMostCodedlanguages(mostCodedlanguages);
-        setMostCodedProjects(mostCodedProjects);
-
-        setLoading(false);
-      } else {
-        setLoading(false);
-      }
-    };
-
-    getUserFileLogs();
-  }, [user]);
-
-  if (loading) {
-    return (
-      <Layout user={user}>
-        <h1>loading...</h1>
-      </Layout>
-    );
-  }
-
+const Dashboard = (props) => {
   const getTimeSpend = () => {
-    const timespend = 0;
+    let timespend = 0;
 
-    filesLogs[0].files_logs.map((file) => {
+    props.filesLogs[0].files_logs.map((file) => {
       timespend += file.timeSpend;
     });
 
@@ -98,8 +36,7 @@ const Dashboard = ({ user }) => {
   };
 
   const RenderTimeByDateChart = () => {
-    console.log(timeSpendByLanguages.length);
-    if (timeSpendByLanguages.length < 1) {
+    if (props.timeSpendByLanguages.length < 1) {
       return (
         <div className="h-64 flex justify-center items-center align-middle content-center m-auto">
           <h1 className="text-gray-400">Nothing to see here, yet</h1>
@@ -108,7 +45,7 @@ const Dashboard = ({ user }) => {
     } else {
       return (
         <MyResponsiveBar
-          data={timeSpentOnLanguagesByDate}
+          data={props.timeSpentOnLanguagesByDay}
           keyschar={["python", "javascript", "css", "typescript"]}
           index="date"
         />
@@ -117,7 +54,7 @@ const Dashboard = ({ user }) => {
   };
 
   const RenderTimeByLanguageChart = () => {
-    if (timeSpendByLanguages.length < 1) {
+    if (props.timeSpendByLanguages.length < 1) {
       return (
         <div className="h-64 flex justify-center items-center align-middle content-center m-auto">
           <h1 className="text-gray-400">Nothing to see here, yet</h1>
@@ -125,13 +62,13 @@ const Dashboard = ({ user }) => {
       );
     } else {
       return (
-        <MyResponsivePie data={timeSpendByLanguages} valueLabel="timeSpend" />
+        <MyResponsivePie data={props.timeSpendByLanguages} valueLabel="timeSpend" />
       );
     }
   };
 
   const RenderCalendar = () => {
-    if (effortBydate.length < 1) {
+    if (props.effortByDay.length < 1) {
       return (
         <div className="h-64 flex justify-center items-center align-middle content-center m-auto">
           <h1 className="text-gray-400">Nothing to see here, yet</h1>
@@ -139,13 +76,13 @@ const Dashboard = ({ user }) => {
       );
     } else {
       return (
-        <MyResponsiveCalendar data={effortBydate} />
+        <MyResponsiveCalendar data={props.effortByDay} />
       );
     }
   };
 
   return (
-    <Layout user={user}>
+    <Layout user={props.user}>
       <div className="container grid grid-cols-4 gap-4 grid-rows-6">
         <div className="shadow-lg bg-white pl-5 pr-20 py-5 rounded-lg flex flex-col justify-center align-middle items-start">
           <h2 className="font-bold text-gray-600">Time coded all time</h2>
@@ -153,11 +90,11 @@ const Dashboard = ({ user }) => {
         </div>
         <div className="shadow-lg bg-white pl-5 pr-20 py-5 rounded-lg flex flex-col justify-center align-middle items-start">
           <h2 className="font-bold text-gray-600">Most coded language</h2>
-          <p className="text-2xl text-gray-500">{mostCodedlanguages[0].label}</p>
+          <p className="text-2xl text-gray-500">{props.mostCodedLanguages[0].label}</p>
         </div>
         <div className="shadow-lg bg-white pl-5 pr-20 py-5 rounded-lg flex flex-col justify-center align-middle items-start">
           <h2 className="font-bold text-gray-600">Most Code project</h2>
-          <p className="text-2xl text-gray-500">{mostCodedProjects[0].label}</p>
+          <p className="text-2xl text-gray-500">{props.mostCodedProjects[0].label}</p>
         </div>
         <div className="shadow-lg bg-white pl-5 pr-20 py-5 rounded-lg flex flex-col justify-center align-middle items-start">
           <h2 className="font-bold text-gray-600">Streck</h2>
@@ -180,6 +117,37 @@ const Dashboard = ({ user }) => {
   );
 };
 
-export const getServerSideProps = withPageAuthRequired();
+export const getServerSideProps = withPageAuthRequired({
+  returnTo: "/",
+  async getServerSideProps(ctx) {
+    // access the user session
+    const session = getSession(ctx.req, ctx.res);
+
+    const { error, data } = await supabaseClient
+      .from("user_logs")
+      .select("*")
+      .eq("sub", session.user.sub);
+
+    const effort = await getEffortByDay(data[0].files_logs);
+    const codedLanguages = await getMostCodedLanguages(data[0].files_logs);
+    const codedProjects = await getMostCodedProjects(data[0].files_logs);
+    const timeSpend = await getTimeSpendByLanguages(data[0].files_logs);
+    const timeSpendByDay = await getTimeSpentOnLanguagesByDay(
+      data[0].files_logs
+    );
+
+    return {
+      props: {
+        user: session.user,
+        effortByDay: effort,
+        mostCodedLanguages: codedLanguages,
+        mostCodedProjects: codedProjects,
+        timeSpendByLanguages: timeSpend,
+        timeSpentOnLanguagesByDay: timeSpendByDay,
+        filesLogs: data,
+      },
+    };
+  },
+});
 
 export default Dashboard;
