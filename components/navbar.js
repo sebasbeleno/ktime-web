@@ -48,7 +48,7 @@ export default function Navbar() {
     if (user) {
       return (
         <div className="">
-          <h1 className="font-bold text-gray-600 text-xl">Hi, Sebastian</h1>
+          <h1 className="font-bold text-gray-600 text-xl">Hi, {user.name}</h1>
           <h1 className="font-sans text-gray-500">Welcome back to Ktime</h1>
         </div>
       );
@@ -61,7 +61,7 @@ export default function Navbar() {
     <Disclosure as="nav" className="bg-gray-50">
       {({ open }) => (
         <>
-          <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
+          <div className="px-2 sm:px-6 lg:px-8">
             <div className="relative flex items-center justify-between h-24">
               <div className="absolute inset-y-0 left-0 flex items-center  sm:hidden">
                 {/* Mobile menu button*/}
@@ -74,7 +74,7 @@ export default function Navbar() {
                   )}
                 </Disclosure.Button>
               </div>
-              <div className="absolute inset-y-0 right-0 flex min-w-full justify-between items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-2 ">
+              <div className="absolute inset-y-0 right-0 flex min-w-full justify-between items-center pr-2 sm:static sm:inset-auto sm:pl-4 sm:pr-2 ">
                 {RenderWelcomeMessage()}
                 {renderUserAvatar(user)}
               </div>

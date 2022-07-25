@@ -1,32 +1,13 @@
 import { ResponsiveBar } from "@nivo/bar";
 
-export const data = [
-  {
-    created_at: "2022-07-23",
-    python: 5,
-    javascript: 6,
-  },
-  {
-    created_at: "2022-07-24",
-    python: 2,
-    javascript: 8,
-    css: 1,
-  },
-  {
-    created_at: "2022-07-2",
-    python: 3,
-    javascript: 8,
-    css: 1.3,
-  },
-];
-const BarChar = () => {
+const BarChar = ({ data, keyschar, index }) => {
   return (
     <ResponsiveBar
       data={data}
-      keys={["python", "javascript", "css"]}
-      indexBy="created_at"
+      keys={keyschar}
+      indexBy={index}
       margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
-      padding={0.3}
+      padding={0.5}
       valueScale={{ type: "linear" }}
       indexScale={{ type: "band", round: true }}
       colors={{ scheme: "blue_green" }}
@@ -75,8 +56,6 @@ const BarChar = () => {
         },
       ]}
       animate={true}
-      motionStiffness={90}
-      motionDamping={15}
       label={(value) => `${value.value} ${value.value > 1 ? "hours" : "hour"}`}
       role="application"
       ariaLabel="Nivo bar chart demo"
