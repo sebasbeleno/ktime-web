@@ -75,6 +75,7 @@ const Dashboard = ({ user }) => {
         setLoading(false);
       }
     };
+
     getUserFileLogs();
   }, [user]);
 

@@ -1,6 +1,5 @@
 import Navbar from "./navbar";
 import Sidebar from "./sidebar";
-import ThemeSwitcher from "./ThemeSwitcher";
 
 export default function Layout({ children, user }) {
   return (
@@ -12,12 +11,12 @@ export default function Layout({ children, user }) {
           <main className="flex flex-row min-h-max p-4">{children}</main>
         </div>
       </div>
-      <button
+      {/* <button
         className="absolute bottom-5 right-5 w-10 h-10 rounded-full bg-gray-800 flex justify-center items-center text-white"
         id="theme-toggle"
       >
         <ThemeSwitcher />
-      </button>
+      </button> */}
     </div>
   );
 }
