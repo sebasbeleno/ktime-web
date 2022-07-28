@@ -36,38 +36,20 @@ export default async function handler(req, res) {
 
     if (files && projects) {
       try {
-        const query = await supabaseClient
-          .from("user_logs")
-          .select("*")
-          .eq("sub", req.user.sub);
+        const { data, error } = await supabaseClient
+          .from("files_logs")
+          .insert(files);
+        const { data: data2, error: error2 } = await supabaseClient
+          .from("projects_logs")
+          .insert(projects);
 
-        if (query.data.length > 0) {
-          // Update the files_logs and projects_logs json  array with the new data
-          const filesLogs = query.data[0].files_logs;
-          const projectsLogs = query.data[0].projects_logs;
-
-          filesLogs.push(files);
-          projectsLogs.push(projects);
-
-          await supabaseClient
-            .from("user_logs")
-            .update({
-              files_logs: filesLogs,
-              projects_logs: projectsLogs,
-            })
-            .eq("sub", req.user.sub);
-
-          res.status(200).send("updated");
+        if (error || error2) {
+          res.status(500).send(error || error2);
         } else {
-          const { data } = await supabaseClient.from("user_logs").insert({
-            sub: req.user.sub,
-            files_logs: [files],
-            projects_logs: [projects],
-          });
-
-          res.status(200).send("inserted");
+          res.status(200).send("Success");
         }
       } catch (err) {
+        console.log(err);
         res.status(500).send(err);
       }
     } else {

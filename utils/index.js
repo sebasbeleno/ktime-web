@@ -1,3 +1,5 @@
+import moment from "moment";
+
 export function getFileBodyRequest(req) {
   const body = req.body;
   const sub = req.user.sub;
@@ -30,8 +32,9 @@ function getFileLogs(body, userid) {
       language,
       timeSpend,
       projectFolder,
-      date,
-      useriD: userid,
+      dateTime: date,
+      sub: userid,
+      operatingSystem: "darwin",
     };
   } else {
     return null;
@@ -47,7 +50,7 @@ function getProjectLogs(body, userid) {
     return {
       projectFolder,
       date,
-      useriD: userid,
+      sub: userid,
       timeSpend,
     };
   } else {
@@ -85,8 +88,8 @@ export function convertMsToHM(milliseconds) {
 
 export const getTimeSpentOnLanguagesByDay = async (file_logs) => {
   const timSpentOnLanguagesByDay = file_logs.reduce((acc, file) => {
-    const { language, date } = file;
-    const dateString = date;
+    const { language, dateTime } = file;
+    const dateString = dateTime;
     if (acc[dateString]) {
       if (acc[dateString][language]) {
         acc[dateString][language] = +(
@@ -127,23 +130,23 @@ export const getTimeSpendByLanguages = async (file_logs) => {
   }, {});
 
   // convert object to array
-  const timeSpendByLanguagesArray = Object.keys(timeSpendByLanguages).map(
-    (key) => {
+  const timeSpendByLanguagesArray = Object.keys(timeSpendByLanguages)
+    .map((key) => {
       return {
         id: key,
         label: key,
         timeSpend: +(Math.round(timeSpendByLanguages[key] + "e+2") + "e-2"),
       };
-    }
-  );
+    })
+    .slice(0, 5);
 
   return timeSpendByLanguagesArray;
 };
 
 export const getEffortByDay = async (file_logs) => {
   const effortByDay = file_logs.reduce((acc, file) => {
-    const { date } = file;
-    const dateString = date;
+    const { dateTime } = file;
+    const dateString = dateTime;
     if (acc[dateString]) {
       acc[dateString] += msToHours(file.timeSpend);
     } else {
@@ -152,22 +155,12 @@ export const getEffortByDay = async (file_logs) => {
     return acc;
   }, {});
 
-  const effortByDayArray = Object.keys(effortByDay)
-    .map((key) => {
-      //Format date to YYYY-MM-DD
-      const date = new Date(key);
-      const formattedDate = `${date.getFullYear()}-${padTo2Digits(
-        date.getMonth() + 1
-      )}-${padTo2Digits(date.getDate())}`;
-
-      return {
-        day: formattedDate,
-        value: effortByDay[key],
-      };
-    })
-    .sort((a, b) => {
-      return new Date(a.date) - new Date(b.date);
-    });
+  const effortByDayArray = Object.keys(effortByDay).map((key) => {
+    return {
+      day: key,
+      value: effortByDay[key],
+    };
+  });
 
   return effortByDayArray;
 };
@@ -195,20 +188,23 @@ export const getMostCodedLanguages = async (file_logs) => {
     return acc;
   }, {});
 
-  const mostCodedLanguagesArray = Object.keys(mostCodedLanguages).map(
-    (key) => {
+  const mostCodedLanguagesArray = Object.keys(mostCodedLanguages)
+    .map((key) => {
       return {
         id: key,
         label: key,
-        time: +(Math.round(msToMinutes(mostCodedLanguages[key]) + "e+2") + "e-2"),
+        time: +(
+          Math.round(msToMinutes(mostCodedLanguages[key]) + "e+2") + "e-2"
+        ),
       };
-    }
-  ).sort((a, b) => {
-    return b.time - a.time;
-  }).slice(0, 5);
+    })
+    .sort((a, b) => {
+      return b.time - a.time;
+    })
+    .slice(0, 5);
 
   return mostCodedLanguagesArray;
-}
+};
 
 export const getMostCodedProjects = async (file_logs) => {
   const mostCodedProjects = file_logs.reduce((acc, file) => {
@@ -221,17 +217,48 @@ export const getMostCodedProjects = async (file_logs) => {
     return acc;
   }, {});
 
-  const mostCodedProjectsArray = Object.keys(mostCodedProjects).map(
-    (key) => {
+  const mostCodedProjectsArray = Object.keys(mostCodedProjects)
+    .map((key) => {
       return {
         id: key,
         label: key,
-        time: +(Math.round(msToMinutes(mostCodedProjects[key]) + "e+2") + "e-2"),
+        time: +(
+          Math.round(msToMinutes(mostCodedProjects[key]) + "e+2") + "e-2"
+        ),
       };
-    }
-  ).sort((a, b) => {
-    return b.time - a.time;
-  }).slice(0, 5);
+    })
+    .sort((a, b) => {
+      return b.time - a.time;
+    })
+    .slice(0, 5);
 
   return mostCodedProjectsArray;
-}
+};
+
+
+export const getTimeSpendByDay = (file_logs) => {
+  const timeSpendByDay = file_logs.reduce((acc, file) => {
+    const { dateTime } = file;
+    const dateString = dateTime;
+    if (acc[dateString]) {
+      acc[dateString] += file.timeSpend;
+    } else {
+      acc[dateString] = file.timeSpend;
+    }
+    return acc;
+  }, {});
+
+  const timeSpendByDayArray = Object.keys(timeSpendByDay).map((key) => {
+    return {
+      x: key,
+      y: msToHours(timeSpendByDay[key]),
+    };
+  });
+
+  return [
+    {
+      id: 'Hours',
+      data: timeSpendByDayArray,
+    }
+  ];
+};
