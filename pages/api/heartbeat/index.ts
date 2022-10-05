@@ -1,7 +1,8 @@
-import { supabaseClient } from "@supabase/auth-helpers-nextjs";
 import fetch from "node-fetch";
 import { getFileBodyRequest } from "../../../utils";
 import { runMiddleware } from "../../../utils/runMiddleware";
+import client from "../../../mongo";
+import { MongoEnums } from "../../../utils/enums";
 
 async function middleware(req, res, next) {
   const token = req.headers.authorization;
@@ -36,18 +37,30 @@ export default async function handler(req, res) {
 
     if (files && projects) {
       try {
-        const { data, error } = await supabaseClient
-          .from("files_logs")
-          .insert(files);
-        const { data: data2, error: error2 } = await supabaseClient
-          .from("projects_logs")
-          .insert(projects);
+        // Connect to the MongoDB cluster
+        await client.connect();
 
-        if (error || error2) {
-          res.status(500).send(error || error2);
-        } else {
-          res.status(200).send("Success");
-        }
+        // Make the appropriate DB calls
+        const database = client.db(MongoEnums.DATABASE);
+
+        const projectsCollection = database.collection(
+          MongoEnums.PROJECTS_COLLECTION
+        );
+
+        const filesCollection = database.collection(
+          MongoEnums.FILES_COLLECTION
+        );
+
+        // insert in the projects collection with the user id
+        const projectsInsert = await projectsCollection.insertOne(projects);
+
+        // insert in the files collection with the user id
+        const filesInsert = await filesCollection.insertOne(files);
+
+        res.status(200).json({
+          projects: projectsInsert,
+          files: filesInsert,
+        });
       } catch (err) {
         console.log(err);
         res.status(500).send(err);
