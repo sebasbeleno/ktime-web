@@ -1,6 +1,6 @@
 import { ResponsiveCalendar } from "@nivo/calendar";
 
-const CaldendarChart = ({ data, keys, index }) => {
+const CaldendarChart = ({ data }) => {
   return (
     <ResponsiveCalendar
       data={data}

@@ -117,13 +117,7 @@ const Dashboard = (props) => {
         });
       });
 
-      return (
-        <MyResponsiveLineChar
-          data={timeSpentOnLanguagesByDay}
-          keyschar={labels}
-          index="date"
-        />
-      );
+      return <MyResponsiveLineChar data={timeSpentOnLanguagesByDay} />;
     }
   };
 
