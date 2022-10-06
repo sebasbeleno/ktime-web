@@ -19,7 +19,7 @@ export function getFileBodyRequest(req) {
   }
 }
 
-function getFileLogs(body, userid) {
+function getFileLogs(body, userid: string) {
   const filePath = body.filePath;
   const language = body.language;
   const timeSpend = body.timeSpend;
@@ -58,22 +58,23 @@ function getProjectLogs(body, userid) {
   }
 }
 
-function padTo2Digits(num) {
+function padTo2Digits(num: number) {
   return num.toString().padStart(2, "0");
 }
 
-export function msToTime(ms) {
+export function msToTime(ms: number) {
   let seconds = (ms / 1000).toFixed(1);
   let minutes = (ms / (1000 * 60)).toFixed(1);
   let hours = (ms / (1000 * 60 * 60)).toFixed(1);
   let days = (ms / (1000 * 60 * 60 * 24)).toFixed(1);
-  if (seconds < 60) return seconds + " Seconds";
-  else if (minutes < 60) return minutes + " Minutes";
-  else if (hours < 24) return hours + " Hours";
+
+  if (parseInt(seconds) < 60) return seconds + " Seconds";
+  else if (parseInt(minutes) < 60) return minutes + " Minutes";
+  else if (parseInt(hours) < 24) return hours + " Hours";
   else return days + " Days";
 }
 
-export function convertMsToHM(milliseconds) {
+export function convertMsToHM(milliseconds: number) {
   let seconds = Math.floor(milliseconds / 1000);
   let minutes = Math.floor(seconds / 60);
   let hours = Math.floor(minutes / 60);
@@ -90,11 +91,14 @@ export const getTimeSpentOnLanguagesByDay = async (file_logs) => {
   const timSpentOnLanguagesByDay = file_logs.reduce((acc, file) => {
     const { language, dateTime } = file;
     const dateString = dateTime;
+
     if (acc[dateString]) {
       if (acc[dateString][language]) {
         acc[dateString][language] = +(
           Math.round(
-            msToHours(file.timeSpend) + acc[dateString][language] + "e+2"
+            parseInt(
+              msToHours(file.timeSpend) + acc[dateString][language] + "e+2"
+            )
           ) + "e-2"
         );
       } else {
@@ -129,13 +133,17 @@ export const getTimeSpendByLanguages = async (file_logs) => {
     return acc;
   }, {});
 
+  console.log("---");
+  console.log(timeSpendByLanguages);
+
   // convert object to array
   const timeSpendByLanguagesArray = Object.keys(timeSpendByLanguages)
     .map((key) => {
+      console.log();
       return {
         id: key,
         label: key,
-        timeSpend: +(Math.round(timeSpendByLanguages[key] + "e+2") + "e-2"),
+        timeSpend: timeSpendByLanguages[key],
       };
     })
     .slice(0, 5);
@@ -165,13 +173,14 @@ export const getEffortByDay = async (file_logs) => {
   return effortByDayArray;
 };
 
-function msToHours(millisec) {
+// Converts milliseconds to hours, if hours is less than 1, it returns minutes
+function msToHours(millisec: number) {
   var hours = (millisec / (1000 * 60 * 60)).toFixed(1);
 
   return parseFloat(hours);
 }
 
-function msToMinutes(millisec) {
+function msToMinutes(millisec: number) {
   var minutes = (millisec / (1000 * 60)).toFixed(1);
 
   return parseFloat(minutes);
@@ -194,7 +203,8 @@ export const getMostCodedLanguages = async (file_logs) => {
         id: key,
         label: key,
         time: +(
-          Math.round(msToMinutes(mostCodedLanguages[key]) + "e+2") + "e-2"
+          Math.round(parseInt(msToMinutes(mostCodedLanguages[key]) + "e+2")) +
+          "e-2"
         ),
       };
     })
@@ -223,7 +233,8 @@ export const getMostCodedProjects = async (file_logs) => {
         id: key,
         label: key,
         time: +(
-          Math.round(msToMinutes(mostCodedProjects[key]) + "e+2") + "e-2"
+          Math.round(parseInt(msToMinutes(mostCodedProjects[key]) + "e+2")) +
+          "e-2"
         ),
       };
     })
@@ -234,7 +245,6 @@ export const getMostCodedProjects = async (file_logs) => {
 
   return mostCodedProjectsArray;
 };
-
 
 export const getTimeSpendByDay = (file_logs) => {
   const timeSpendByDay = file_logs.reduce((acc, file) => {
@@ -282,8 +292,8 @@ export const getTimeSpendByDay = (file_logs) => {
   console.log(timeSpendByDayArray);
   return [
     {
-      id: 'Hours',
+      id: "Hours",
       data: timeSpendByDayArray,
-    }
+    },
   ];
 };

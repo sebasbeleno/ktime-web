@@ -1,10 +1,8 @@
 /* This example requires Tailwind CSS v2.0+ */
-import { useUser } from "@auth0/nextjs-auth0";
+import { UserProfile } from "@auth0/nextjs-auth0";
 import { Disclosure, Menu } from "@headlessui/react";
 import { MenuIcon, XIcon } from "@heroicons/react/outline";
-import { supabaseClient } from "@supabase/auth-helpers-nextjs";
 import Image from "next/image";
-import { useRouter } from "next/router";
 
 const navigation = [{ name: "Dashboard", href: "#", current: true }];
 
@@ -12,17 +10,11 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Navbar() {
-  const router = useRouter();
-  const { user, isLoading, error } = useUser();
+interface LayoutProps {
+  user?: UserProfile;
+}
 
-  const onSignOut = async () => {
-    console.log("Signing out");
-    const { logout } = await supabaseClient.auth.signOut();
-
-    router.push("/");
-  };
-
+export default function Navbar({ user }: LayoutProps) {
   const renderUserAvatar = (user) => {
     if (user) {
       return (

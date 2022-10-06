@@ -1,6 +1,5 @@
 // pages/profile.js
-import { getSession, withPageAuthRequired } from "@auth0/nextjs-auth0";
-import { supabaseClient } from "@supabase/auth-helpers-nextjs";
+import { withPageAuthRequired } from "@auth0/nextjs-auth0";
 import dynamic from "next/dynamic";
 import Layout from "../../components/layout";
 import {
@@ -8,33 +7,14 @@ import {
   getMostCodedLanguages,
   getMostCodedProjects,
   getTimeSpendByLanguages,
-  getTimeSpentOnLanguagesByDay,
   msToTime,
   getTimeSpendByDay,
 } from "../../utils";
 import { useEffect, useState } from "react";
+import PieChart from "../../components/charts/pie";
+import CalendarChart from "../../components/charts/calendar";
+import LineChart from "../../components/charts/line";
 
-const MyResponsiveBar = dynamic(() => import("../../components/charts/bar"), {
-  ssr: false,
-});
-
-const MyResponsivePie = dynamic(() => import("../../components/charts/pie"), {
-  ssr: false,
-});
-
-const MyResponsiveCalendar = dynamic(
-  () => import("../../components/charts/calendar"),
-  {
-    ssr: false,
-  }
-);
-
-const MyResponsiveLineChar = dynamic(
-  () => import("../../components/charts/line"),
-  {
-    ssr: false,
-  }
-);
 
 const Dashboard = (props) => {
   const [filesLogs, setFilesLogs] = useState([]);
@@ -45,11 +25,6 @@ const Dashboard = (props) => {
     []
   );
   const [timeSpendByLanguages, setTimeSpendByLanguages] = useState([]);
-  const [timeSpendByProjects, setTimeSpendByProjects] = useState([]);
-  const [timeSpendByProjectsByDay, setTimeSpendByProjectsByDay] = useState([]);
-  const [timeSpendByLanguagesByDay, setTimeSpendByLanguagesByDay] = useState(
-    []
-  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -117,7 +92,7 @@ const Dashboard = (props) => {
         });
       });
 
-      return <MyResponsiveLineChar data={timeSpentOnLanguagesByDay} />;
+      return <LineChart data={timeSpentOnLanguagesByDay} />;
     }
   };
 
@@ -129,9 +104,7 @@ const Dashboard = (props) => {
         </div>
       );
     } else {
-      return (
-        <MyResponsivePie data={timeSpendByLanguages} valueLabel="timeSpend" />
-      );
+      return <PieChart data={timeSpendByLanguages} valueLabel="timeSpend" />;
     }
   };
 
@@ -143,7 +116,7 @@ const Dashboard = (props) => {
         </div>
       );
     } else {
-      return <MyResponsiveCalendar data={effortByDay} />;
+      return <CalendarChart data={effortByDay} />;
     }
   };
 

@@ -4,6 +4,7 @@ import { Layout } from "../components";
 
 export default function Index() {
   const { user } = useUser();
+
   const RenderUserAuth = () => {
     if (!user) {
       return (
