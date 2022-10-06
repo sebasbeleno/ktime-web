@@ -255,6 +255,31 @@ export const getTimeSpendByDay = (file_logs) => {
     };
   });
 
+  // if the array is length is less than 7, add the missing days
+  if (timeSpendByDayArray.length < 7) {
+    const lastDate = timeSpendByDayArray[timeSpendByDayArray.length - 1].x;
+    const lastDateObject = new Date(lastDate);
+    const lastDateNumber = lastDateObject.getDate();
+    const lastDateMonth = lastDateObject.getMonth();
+    const lastDateYear = lastDateObject.getFullYear();
+
+    for (let i = 1; i < 7; i++) {
+      const newDate = new Date(
+        lastDateYear,
+        lastDateMonth,
+        lastDateNumber - i
+      ).toISOString();
+      const newDateString = newDate.split("T")[0];
+      const newDateObject = {
+        x: newDateString,
+        y: 0,
+      };
+
+      timeSpendByDayArray.unshift(newDateObject);
+    }
+  }
+
+  console.log(timeSpendByDayArray);
   return [
     {
       id: 'Hours',

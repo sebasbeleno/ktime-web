@@ -7,7 +7,7 @@ const CaldendarChart = ({ data, keys, index }) => {
       from="2022-01-02"
       to="2022-12-31"
       emptyColor="#eeeeee"
-      colors={["#61cdbb", "#97e3d5", "#e8c1a0", "#f47560"]}
+      colors={["#d4ffe3", "#80ffab", "#2aff73", "#00d448"]}
       margin={{ top: 40, right: 40, bottom: 40, left: 40 }}
       yearSpacing={60}
       monthBorderColor="#ffffff"

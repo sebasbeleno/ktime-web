@@ -10,7 +10,7 @@ import {
   getTimeSpendByLanguages,
   getTimeSpentOnLanguagesByDay,
   msToTime,
-  getTimeSpendByDay
+  getTimeSpendByDay,
 } from "../../utils";
 import { useEffect, useState } from "react";
 
@@ -53,11 +53,15 @@ const Dashboard = (props) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchData(params) {
-      const { error, data } = await supabaseClient
-        .from("files_logs")
-        .select("*")
-        .eq("sub", props.user.sub);
+    async function fetchData() {
+      const response = await fetch(`/api/files/${props.user.sub}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const { data } = await response.json();
 
       setFilesLogs(data);
 
@@ -65,7 +69,7 @@ const Dashboard = (props) => {
       const codedLanguages = await getMostCodedLanguages(data);
       const codedProjects = await getMostCodedProjects(data);
       const timeSpend = await getTimeSpendByLanguages(data);
-      const timeSpendByDay =  getTimeSpendByDay(data);
+      const timeSpendByDay = getTimeSpendByDay(data);
 
       console.log();
       setEffortByDay(effort);
@@ -184,10 +188,7 @@ const Dashboard = (props) => {
         <div className="col-span-2 row-span-3 shadow-lg bg-white rounded-lg flex flex-col justify-center align-middle items-start">
           {RenderTimeByDateChart()}
         </div>
-        <div className="col-span-1 row-span-3 shadow-lg bg-white rounded-lg flex flex-col justify-center align-middle items-start">
-          {RenderTimeByLanguageChart()}
-        </div>
-        <div className="col-span-1 row-span-3 shadow-lg bg-white rounded-lg flex flex-col justify-center align-middle items-start">
+        <div className="col-span-2 row-span-3 shadow-lg bg-white rounded-lg flex flex-col justify-center align-middle items-start">
           {RenderTimeByLanguageChart()}
         </div>
       </div>

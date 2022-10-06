@@ -1,5 +1,7 @@
 import React from "react";
 import { ResponsiveLine } from "@nivo/line";
+import moment from "moment";
+const isOddDay = (value) => moment(value).dayOfYear() % 2 == 0;
 
 const MyResponsiveLine = ({ data }) => (
   <ResponsiveLine
@@ -24,8 +26,16 @@ const MyResponsiveLine = ({ data }) => (
       legendOffset: -40,
       legendPosition: "middle",
     }}
+    axisBottom={{
+      format: function (value) {
+        return isOddDay(value) ? moment(value).format("MMM Do") : "";
+      },
+      tickSize: function (value) {
+        return isOddDay(value) ? 5 : 0;
+      },
+    }}
     pointSize={10}
-    colors={{ scheme: 'paired' }}
+    colors={{ scheme: "paired" }}
     pointColor={{ theme: "background" }}
     pointBorderWidth={2}
     pointBorderColor={{ from: "serieColor" }}
